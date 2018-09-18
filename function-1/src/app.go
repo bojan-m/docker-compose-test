@@ -1,11 +1,3 @@
-// package main
-//
-// import "fmt"
-//
-// func main() {
-// 	fmt.Printf("hello, world\n")
-// }
-
 package main
 
 import (
@@ -16,7 +8,7 @@ import (
 func sayHello(w http.ResponseWriter, r *http.Request) {
   message := r.URL.Path
   message = strings.TrimPrefix(message, "/")
-  message = "Hello " + message
+  message = "Multiply is:" + message
 
   w.Write([]byte(message))
 }
