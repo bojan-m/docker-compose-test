@@ -1,20 +1,52 @@
 package main
 
 import (
+  // "fmt"
+  // "os"
   "net/http"
   "strings"
+  "log"
+  "io/ioutil"
 )
 
-func sayHello(w http.ResponseWriter, r *http.Request) {
+func readUrl(w http.ResponseWriter, r *http.Request) {
   message := r.URL.Path
   message = strings.TrimPrefix(message, "/")
-  message = "zasto ne radi:" + message
+  switch {
+    case message == "function-1":
+      response, err := http.Get("http://function-1:8081")
+      if err != nil {
+          log.Fatal(err)
+      }
+      defer response.Body.Close()
+      test, err := ioutil.ReadAll(response.Body)
+      if err != nil {
+        log.Fatal(err)
+      }
+      stringBody := string(test)
+      w.Write([]byte(stringBody))
 
-  w.Write([]byte(message))
-}
+    case message == "function-2":
+      response, err := http.Get("http://function-2:8082")
+      if err != nil {
+          log.Fatal(err)
+      }
+      defer response.Body.Close()
+      test, err := ioutil.ReadAll(response.Body)
+      if err != nil {
+        log.Fatal(err)
+      }
+      stringBody := string(test)
+      w.Write([]byte(stringBody))
+
+    default:
+      message = "wrong request"
+      w.Write([]byte(message))
+    }
+  }
 
 func main() {
-  http.HandleFunc("/", sayHello)
+  http.HandleFunc("/", readUrl)
   if err := http.ListenAndServe(":8080", nil); err != nil {
     panic(err)
   }
