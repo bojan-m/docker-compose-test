@@ -1,7 +1,7 @@
 package main
 
 import (
-  // "fmt"
+    // "fmt"
   // "os"
     "net/http"
     // "strings"
@@ -11,16 +11,17 @@ import (
 )
 
 func readUrl(w http.ResponseWriter, r *http.Request) {
-  // message := r.URL.Path
-  // // params := strings.TrimSuffix(message, "?")
-  // message = strings.TrimPrefix(message, "/")
   u, err := url.Parse(r.URL.Path)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+  q := r.URL.Query()
+
   switch {
-    case u.Path == "/function-1":
-      response, err := http.Get("http://function-1:8081/")
+    case u.Path == "/function-1" && len(q) > 1:
+      response, err := http.PostForm("http://function-1:8081/",
+            url.Values{"a" : q["a"], "b" : q["b"]})
       if err != nil {
           log.Fatal(err)
       }

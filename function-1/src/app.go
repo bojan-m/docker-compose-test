@@ -2,35 +2,32 @@ package main
 
 import (
   "net/http"
-  "net/url"
-  "fmt"
-  "log"
   "strconv"
   "os"
+  "fmt"
 )
 
 func sayHello(w http.ResponseWriter, r *http.Request) {
-  u, err := url.Parse(r.URL.Path)
-	if err != nil {
-		log.Fatal(err)
-	}
-	q := u.Query()
-  prvi, err := strconv.Atoi(q.Get("a"))
-    	if err != nil {
-        	fmt.Println(err)
-        	os.Exit(2)
-    		}
-  fmt.Println(prvi)
+  r.ParseForm()
+  x := r.Form.Get("a")
+  y := r.Form.Get("b")
 
-	drugi, err := strconv.Atoi(q.Get("b"))
+  prvi, err := strconv.Atoi(x)
     	if err != nil {
         	fmt.Println(err)
         	os.Exit(2)
     		}
-  
+
+	drugi, err := strconv.Atoi(y)
+    	if err != nil {
+        	fmt.Println(err)
+        	os.Exit(2)
+    		}
+
   test := strconv.Itoa(prvi + drugi)
 
-  w.Write([]byte("jel radi?" + test))
+  w.Write([]byte("Sum of values is: " + test))
+
 }
 
 func main() {
