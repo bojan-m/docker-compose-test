@@ -11,10 +11,11 @@ import (
 
 func readUrl(w http.ResponseWriter, r *http.Request) {
   message := r.URL.Path
+  params := strings.TrimSuffix(message, "?")
   message = strings.TrimPrefix(message, "/")
   switch {
     case message == "function-1":
-      response, err := http.Get("http://function-1:8081")
+      response, err := http.Get("http://function-1:8081/" + string(params))
       if err != nil {
           log.Fatal(err)
       }
