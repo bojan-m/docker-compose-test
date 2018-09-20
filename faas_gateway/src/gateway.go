@@ -1,11 +1,8 @@
 package main
 
 import (
-    // "fmt"
-  // "os"
+    "fmt"
     "net/http"
-    // "strings"
-    "log"
     "io/ioutil"
     "net/url"
 )
@@ -13,7 +10,7 @@ import (
 func readUrl(w http.ResponseWriter, r *http.Request) {
   u, err := url.Parse(r.URL.Path)
 	if err != nil {
-		log.Fatal(err)
+		fmt.Println(err)
 	}
 
   q := r.URL.Query()
@@ -23,31 +20,32 @@ func readUrl(w http.ResponseWriter, r *http.Request) {
       response, err := http.PostForm("http://function-1:8081/",
             url.Values{"a" : q["a"], "b" : q["b"]})
       if err != nil {
-          log.Fatal(err)
+          fmt.Println(err)
       }
       defer response.Body.Close()
       test, err := ioutil.ReadAll(response.Body)
       if err != nil {
-        log.Fatal(err)
+        fmt.Println(err)
       }
       stringBody := string(test)
       w.Write([]byte(stringBody))
 
-    case u.Path == "/function-2":
-      response, err := http.Get("http://function-2:8082")
+    case u.Path == "/function-2" && len(q) == 1:
+      response, err := http.PostForm("http://function-2:8082/",
+            url.Values{ "url" : q["url"]})
       if err != nil {
-          log.Fatal(err)
+          fmt.Println(err)
       }
       defer response.Body.Close()
       test, err := ioutil.ReadAll(response.Body)
       if err != nil {
-        log.Fatal(err)
+        fmt.Println(err)
       }
       stringBody := string(test)
       w.Write([]byte(stringBody))
 
     default:
-      message := "wrong request"
+      message := "Invalid request"
       w.Write([]byte(message))
     }
   }

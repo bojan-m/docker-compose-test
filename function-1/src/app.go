@@ -3,11 +3,10 @@ package main
 import (
   "net/http"
   "strconv"
-  "os"
   "fmt"
 )
 
-func sayHello(w http.ResponseWriter, r *http.Request) {
+func sumOfValues(w http.ResponseWriter, r *http.Request) {
   r.ParseForm()
   x := r.Form.Get("a")
   y := r.Form.Get("b")
@@ -15,13 +14,11 @@ func sayHello(w http.ResponseWriter, r *http.Request) {
   prvi, err := strconv.Atoi(x)
     	if err != nil {
         	fmt.Println(err)
-        	os.Exit(2)
     		}
 
 	drugi, err := strconv.Atoi(y)
     	if err != nil {
         	fmt.Println(err)
-        	os.Exit(2)
     		}
 
   test := strconv.Itoa(prvi + drugi)
@@ -31,7 +28,7 @@ func sayHello(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-  http.HandleFunc("/", sayHello)
+  http.HandleFunc("/", sumOfValues)
   if err := http.ListenAndServe(":8081", nil); err != nil {
     panic(err)
   }
