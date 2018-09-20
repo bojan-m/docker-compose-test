@@ -3,19 +3,24 @@ package main
 import (
   // "fmt"
   // "os"
-  "net/http"
-  "strings"
-  "log"
-  "io/ioutil"
+    "net/http"
+    // "strings"
+    "log"
+    "io/ioutil"
+    "net/url"
 )
 
 func readUrl(w http.ResponseWriter, r *http.Request) {
-  message := r.URL.Path
-  params := strings.TrimSuffix(message, "?")
-  message = strings.TrimPrefix(message, "/")
+  // message := r.URL.Path
+  // // params := strings.TrimSuffix(message, "?")
+  // message = strings.TrimPrefix(message, "/")
+  u, err := url.Parse(r.URL.Path)
+	if err != nil {
+		log.Fatal(err)
+	}
   switch {
-    case message == "function-1":
-      response, err := http.Get("http://function-1:8081/" + string(params))
+    case u.Path == "/function-1":
+      response, err := http.Get("http://function-1:8081/")
       if err != nil {
           log.Fatal(err)
       }
@@ -27,7 +32,7 @@ func readUrl(w http.ResponseWriter, r *http.Request) {
       stringBody := string(test)
       w.Write([]byte(stringBody))
 
-    case message == "function-2":
+    case u.Path == "/function-2":
       response, err := http.Get("http://function-2:8082")
       if err != nil {
           log.Fatal(err)
@@ -41,7 +46,7 @@ func readUrl(w http.ResponseWriter, r *http.Request) {
       w.Write([]byte(stringBody))
 
     default:
-      message = "wrong request"
+      message := "wrong request"
       w.Write([]byte(message))
     }
   }
