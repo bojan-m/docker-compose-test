@@ -2,21 +2,20 @@ version: '3'
 
 services:
   faas_gateway:
-    image: golang:alpine
+    build: ./faas_gateway
     ports:
       - "8080:8080"
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ./faas_gateway/:/go/src/docker-compose-test/faas_gateway/
     working_dir: /go/src/docker-compose-test/faas_gateway/src
-    command: go run gateway.go
-
 
   function-1:
     image: golang:alpine
     labels:
-      - "faas.name=func_one"
-      - "faas.port=8080"
+      - "function.name=sumarize"
+      - "function.port=8081"
+      - "function.hostname=function-1"
     volumes:
       - ./function-1:/go/src/docker-compose-test/function-1
     working_dir: /go/src/docker-compose-test/function-1/src
@@ -25,8 +24,9 @@ services:
   function-2:
     image: golang:alpine
     labels:
-      - "faas.name:func_two"
-      - "faas.port:8080"
+      - "function.name=returnip"
+      - "function.port=8082"
+      - "function.hostname=function-2"
     volumes:
       - ./function-2:/go/src/docker-compose-test/function-2
     working_dir: /go/src/docker-compose-test/function-2/src
