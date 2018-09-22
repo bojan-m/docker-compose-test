@@ -1,11 +1,35 @@
 package main
 
 import (
+  	"context"
     "fmt"
     "net/http"
     "io/ioutil"
     "net/url"
+
+    "github.com/docker/docker/api/types"
+    "github.com/docker/docker/client"
 )
+
+func getFunctions() map[string][]string {
+  cli, err := client.NewClientWithOpts(client.WithVersion("1.38"))
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	containers, err := cli.ContainerList(context.Background(), types.ContainerListOptions{})
+	if err != nil {
+		fmt.Println(err)
+	}
+
+  s := make(map[string][]string)
+
+	for _, container := range containers {
+    s[container.Labels["function.name"]] = []string{container.Labels["function.port"], container.Labels["function.hostname"]}
+	}
+
+  return s
+}
 
 func readUrl(w http.ResponseWriter, r *http.Request) {
   u, err := url.Parse(r.URL.Path)
@@ -13,12 +37,13 @@ func readUrl(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 	}
 
+  s := getFunctions()
+
   q := r.URL.Query()
 
-  switch {
-    case u.Path == "/function-1" && len(q) > 1:
-      response, err := http.PostForm("http://function-1:8081/",
-            url.Values{"a" : q["a"], "b" : q["b"]})
+  value, ok := s[u.Path]
+  if ok && len(q) > 0 {
+    response, err := http.PostForm("http://"+value[1]+":"+value[0]+"/", q)
       if err != nil {
           fmt.Println(err)
       }
@@ -29,22 +54,7 @@ func readUrl(w http.ResponseWriter, r *http.Request) {
       }
       stringBody := string(test)
       w.Write([]byte(stringBody))
-
-    case u.Path == "/function-2" && len(q) == 1:
-      response, err := http.PostForm("http://function-2:8082/",
-            url.Values{ "url" : q["url"]})
-      if err != nil {
-          fmt.Println(err)
-      }
-      defer response.Body.Close()
-      test, err := ioutil.ReadAll(response.Body)
-      if err != nil {
-        fmt.Println(err)
-      }
-      stringBody := string(test)
-      w.Write([]byte(stringBody))
-
-    default:
+    } else {
       message := "Invalid request"
       w.Write([]byte(message))
     }

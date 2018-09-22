@@ -8,6 +8,8 @@ import (
 	"github.com/docker/docker/client"
 )
 
+//for testing the API
+
 func main() {
 	cli, err := client.NewClientWithOpts(client.WithVersion("1.38"))
 	if err != nil {
@@ -19,10 +21,10 @@ func main() {
 		panic(err)
 	}
 
-  s := make([]string, 0)
+  s := make(map[string][]string)
 
 	for _, container := range containers {
-    s = append(s, container.Labels["function.name"], container.Labels["function.port"], container.Labels["function.hostname"])
+    s[container.Labels["function.name"]] = []string{container.Labels["function.port"], container.Labels["function.hostname"]}
 		fmt.Printf("%s %s %s\n", container.Labels["function.name"], container.Labels["function.port"], container.Labels["function.hostname"])
 	}
 

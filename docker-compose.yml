@@ -13,7 +13,7 @@ services:
   function-1:
     image: golang:alpine
     labels:
-      - "function.name=sumarize"
+      - "function.name=/sumarize"
       - "function.port=8081"
       - "function.hostname=function-1"
     volumes:
@@ -24,7 +24,7 @@ services:
   function-2:
     image: golang:alpine
     labels:
-      - "function.name=returnip"
+      - "function.name=/returnip"
       - "function.port=8082"
       - "function.hostname=function-2"
     volumes:
